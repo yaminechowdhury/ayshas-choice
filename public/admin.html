@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aysha's Choice - Admin Panel</title>
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; padding: 20px; }
+    .layout { display: flex; gap: 20px; max-width: 1200px; margin: 0 auto; flex-wrap: wrap; }
+    .container { flex: 1; min-width: 320px; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 20px; }
+    h2 { text-align: center; color: #333; margin-bottom: 20px; font-size: 20px; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; font-weight: bold; margin-bottom: 5px; color: #555; }
+    input, textarea, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+    button { width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer; }
+    button:hover { background: #218838; }
+    #msg { margin-top: 15px; text-align: center; font-weight: bold; }
+    
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; font-size: 13px; }
+    th { background-color: #f8f9fa; }
+    .img-thumb { width: 40px; height: 40px; object-fit: cover; border-radius: 5px; }
+    
+    .btn-edit { background: #ffc107; color: #333; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; margin-right: 5px; }
+    .btn-edit:hover { background: #e0a800; }
+    .btn-delete { background: #dc3545; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+    .btn-delete:hover { background: #c82333; }
+    .badge-cod { background: #e2e3e5; padding: 3px 6px; border-radius: 4px; font-weight: bold; }
+
+    /* Edit Modal Style */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+    .modal-content { background: white; padding: 25px; border-radius: 10px; max-width: 450px; width: 90%; position: relative; }
+    .close-btn { position: absolute; top: 10px; right: 15px; font-size: 22px; cursor: pointer; border: none; background: none; }
+  </style>
+</head>
+<body>
+
+  <!-- TOP SECTION: ORDERS -->
+  <div class="layout" style="margin-bottom: 20px;">
+    <div class="container" style="flex: 100%;">
+      <h2>📦 Customer Orders - Aysha's Choice</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Customer</th>
+            <th>Phone</th>
+            <th>Area</th>
+            <th>Address</th>
+            <th>Total Amount</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="ordersTable">
+          <!-- Orders loaded dynamically -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- BOTTOM SECTION: PRODUCT MANAGEMENT -->
+  <div class="layout">
+    <!-- Upload Form -->
+    <div class="container">
+      <h2>🛠️ Upload New Product</h2>
+      <form id="productForm">
+        <div class="form-group">
+          <label>Product Name</label>
+          <input type="text" id="name" placeholder="e.g. Leather Wallet" required>
+        </div>
+        <div class="form-group">
+          <label>Price (BDT)</label>
+          <input type="number" id="price" placeholder="e.g. 1200" required>
+        </div>
+        <div class="form-group">
+          <label>Category</label>
+          <select id="category" required>
+            <option value="">Select Category</option>
+            <option value="Electronics">Electronics</option>
+            <option value="Clothing">Clothing</option>
+            <option value="Accessories">Accessories</option>
+            <option value="Gadgets">Gadgets</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Select Image</label>
+          <input type="file" id="imageFile" accept="image/*" required>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="description" rows="3" placeholder="Write product details..."></textarea>
+        </div>
+        <button type="submit">Upload Product 🚀</button>
+      </form>
+      <div id="msg"></div>
+    </div>
+
+    <!-- Product Table -->
+    <div class="container">
+      <h2>📋 Existing Products</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="adminProductTable">
+          <!-- Products loaded dynamically -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- EDIT MODAL -->
+  <div class="modal" id="editModal">
+    <div class="modal-content">
+      <button class="close-btn" onclick="closeEditModal()">✖</button>
+      <h2>✏️ Edit Product</h2>
+      <form id="editForm">
+        <input type="hidden" id="editId">
+        <div class="form-group">
+          <label>Product Name</label>
+          <input type="text" id="editName" required>
+        </div>
+        <div class="form-group">
+          <label>Price (BDT)</label>
+          <input type="number" id="editPrice" required>
+        </div>
+        <div class="form-group">
+          <label>Category</label>
+          <select id="editCategory" required>
+            <option value="Electronics">Electronics</option>
+            <option value="Clothing">Clothing</option>
+            <option value="Accessories">Accessories</option>
+            <option value="Gadgets">Gadgets</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Change Image (Optional)</label>
+          <input type="file" id="editImageFile" accept="image/*">
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="editDescription" rows="3"></textarea>
+        </div>
+        <button type="submit" style="background:#007bff;">Update Product 💾</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('productForm');
+    const msg = document.getElementById('msg');
+    let productsList = [];
+
+    async function fetchOrders() {
+      try {
+        const res = await fetch('/api/orders');
+        const data = await res.json();
+        const tbody = document.getElementById('ordersTable');
+        tbody.innerHTML = '';
+
+        if (!data.data || data.data.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No orders found</td></tr>';
+          return;
+        }
+
+        data.data.forEach(order => {
+          tbody.innerHTML += `
+            <tr>
+              <td><b>${order.customerName}</b></td>
+              <td>${order.phone}</td>
+              <td>${order.deliveryZone === 'inside' ? 'Inside Dhaka' : 'Outside Dhaka'}</td>
+              <td>${order.address}</td>
+              <td><b>৳ ${order.totalAmount}</b></td>
+              <td><span class="badge-cod">${order.status}</span></td>
+            </tr>`;
+        });
+      } catch (err) { console.error(err); }
+    }
+
+    async function fetchAdminProducts() {
+      try {
+        const res = await fetch('/api/products');
+        const data = await res.json();
+        productsList = data.data || [];
+        const tbody = document.getElementById('adminProductTable');
+        tbody.innerHTML = '';
+
+        if (productsList.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No products found</td></tr>';
+          return;
+        }
+
+        productsList.forEach(prod => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td><img src="${prod.image}" class="img-thumb"></td>
+            <td><b>${prod.name}</b></td>
+            <td>৳ ${prod.price}</td>
+            <td>
+              <button class="btn-edit" onclick="openEditModal('${prod._id}')">Edit ✏️</button>
+              <button class="btn-delete" onclick="deleteProduct('${prod._id}')">Delete 🗑️</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (err) { console.error(err); }
+    }
+
+    function openEditModal(id) {
+      const prod = productsList.find(p => p._id === id);
+      if (!prod) return;
+
+      document.getElementById('editId').value = prod._id;
+      document.getElementById('editName').value = prod.name;
+      document.getElementById('editPrice').value = prod.price;
+      document.getElementById('editCategory').value = prod.category || 'General';
+      document.getElementById('editDescription').value = prod.description || '';
+
+      document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').style.display = 'none';
+    }
+
+    document.getElementById('editForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const id = document.getElementById('editId').value;
+      const formData = new FormData();
+      formData.append('name', document.getElementById('editName').value);
+      formData.append('price', document.getElementById('editPrice').value);
+      formData.append('category', document.getElementById('editCategory').value);
+      formData.append('description', document.getElementById('editDescription').value);
+
+      const fileInput = document.getElementById('editImageFile');
+      if (fileInput.files[0]) {
+        formData.append('imageFile', fileInput.files[0]);
+      }
+
+      try {
+        const res = await fetch(`/api/products/${id}`, { method: 'PUT', body: formData });
+        if (res.ok) {
+          alert('Product Updated Successfully! 🎉');
+          closeEditModal();
+          fetchAdminProducts();
+        } else {
+          alert('Failed to update product!');
+        }
+      } catch (err) { console.error(err); }
+    });
+
+    async function deleteProduct(id) {
+      if (confirm('Are you sure you want to delete this product?')) {
+        try {
+          const res = await fetch(`/api/products/${id}`, { method: 'DELETE' });
+          if (res.ok) {
+            fetchAdminProducts();
+          } else {
+            alert('Failed to delete product!');
+          }
+        } catch (err) { console.error(err); }
+      }
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const fileInput = document.getElementById('imageFile');
+      const formData = new FormData();
+      formData.append('name', document.getElementById('name').value);
+      formData.append('price', document.getElementById('price').value);
+      formData.append('category', document.getElementById('category').value);
+      formData.append('imageFile', fileInput.files[0]);
+      formData.append('description', document.getElementById('description').value);
+
+      msg.style.color = 'blue';
+      msg.innerText = '⏳ Uploading...';
+
+      try {
+        const response = await fetch('/api/products', { method: 'POST', body: formData });
+        const data = await response.json();
+
+        if (response.ok) {
+          msg.style.color = 'green';
+          msg.innerText = '🎉 ' + data.message;
+          form.reset();
+          fetchAdminProducts();
+        } else {
+          msg.style.color = 'red';
+          msg.innerText = '❌ Error: ' + (data.error || data.message);
+        }
+      } catch (err) {
+        msg.style.color = 'red';
+        msg.innerText = '❌ Upload Failed!';
+      }
+    });
+
+    fetchOrders();
+    fetchAdminProducts();
+  </script>
+</body>
+</html>
