@@ -23,6 +23,11 @@
       min-height: 100vh;
     }
 
+    /* Secretly hide everything until password is validated */
+    #mainAdminWrapper {
+      display: none;
+    }
+
     .layout { 
       display: flex; 
       gap: 25px; 
@@ -211,122 +216,154 @@
 </head>
 <body>
 
-  <!-- TOP SECTION: ORDERS -->
-  <div class="layout" style="margin-bottom: 20px;">
-    <div class="container" style="flex: 100%;">
-      <h2>📦 Customer Orders - Aysha's Choice</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Customer</th>
-            <th>Phone</th>
-            <th>Area</th>
-            <th>Address</th>
-            <th>Total Amount</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody id="ordersTable">
-          <!-- Orders loaded dynamically -->
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- BOTTOM SECTION: PRODUCT MANAGEMENT -->
-  <div class="layout">
-    <!-- Upload Form -->
-    <div class="container">
-      <h2>🛠️ Upload New Product</h2>
-      <form id="productForm">
-        <div class="form-group">
-          <label>Product Name</label>
-          <input type="text" id="name" placeholder="e.g. Leather Wallet" required>
-        </div>
-        <div class="form-group">
-          <label>Price (BDT)</label>
-          <input type="number" id="price" placeholder="e.g. 1200" required>
-        </div>
-        <div class="form-group">
-          <label>Category</label>
-          <select id="category" required>
-            <option value="">Select Category</option>
-            <option value="Electronics">Electronics</option>
-            <option value="Clothing">Clothing</option>
-            <option value="Accessories">Accessories</option>
-            <option value="Gadgets">Gadgets</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Select Image</label>
-          <input type="file" id="imageFile" accept="image/*" required>
-        </div>
-        <div class="form-group">
-          <label>Description</label>
-          <textarea id="description" rows="3" placeholder="Write product details..."></textarea>
-        </div>
-        <button type="submit">Upload Product 🚀</button>
-      </form>
-      <div id="msg"></div>
+  <!-- WRAPPER TO HIDE CONTENT UNTIL PASSWORD IS ENTERED -->
+  <div id="mainAdminWrapper">
+    <!-- TOP SECTION: ORDERS -->
+    <div class="layout" style="margin-bottom: 20px;">
+      <div class="container" style="flex: 100%;">
+        <h2>📦 Customer Orders - Aysha's Choice</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th>Phone</th>
+              <th>Area</th>
+              <th>Address</th>
+              <th>Total Amount</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="ordersTable">
+            <!-- Orders loaded dynamically -->
+          </tbody>
+        </table>
+      </div>
     </div>
 
-    <!-- Product Table -->
-    <div class="container">
-      <h2>📋 Existing Products</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Image</th>
-            <th>Name</th>
-            <th>Price</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody id="adminProductTable">
-          <!-- Products loaded dynamically -->
-        </tbody>
-      </table>
-    </div>
-  </div>
+    <!-- BOTTOM SECTION: PRODUCT MANAGEMENT -->
+    <div class="layout">
+      <!-- Upload Form -->
+      <div class="container">
+        <h2>🛠️ Upload New Product</h2>
+        <form id="productForm">
+          <div class="form-group">
+            <label>Product Name</label>
+            <input type="text" id="name" placeholder="e.g. Leather Wallet" required>
+          </div>
+          <div class="form-group">
+            <label>Price (BDT)</label>
+            <input type="number" id="price" placeholder="e.g. 1200" required>
+          </div>
+          <div class="form-group">
+            <label>Category</label>
+            <select id="category" required>
+              <option value="">Select Category</option>
+              <option value="Electronics">Electronics</option>
+              <option value="Clothing">Clothing</option>
+              <option value="Accessories">Accessories</option>
+              <option value="Gadgets">Gadgets</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Select Image</label>
+            <input type="file" id="imageFile" accept="image/*" required>
+          </div>
+          <div class="form-group">
+            <label>Description</label>
+            <textarea id="description" rows="3" placeholder="Write product details..."></textarea>
+          </div>
+          <button type="submit">Upload Product 🚀</button>
+        </form>
+        <div id="msg"></div>
+      </div>
 
-  <!-- EDIT MODAL -->
-  <div class="modal" id="editModal">
-    <div class="modal-content">
-      <button class="close-btn" onclick="closeEditModal()">✖</button>
-      <h2>✏️ Edit Product</h2>
-      <form id="editForm">
-        <input type="hidden" id="editId">
-        <div class="form-group">
-          <label>Product Name</label>
-          <input type="text" id="editName" required>
-        </div>
-        <div class="form-group">
-          <label>Price (BDT)</label>
-          <input type="number" id="editPrice" required>
-        </div>
-        <div class="form-group">
-          <label>Category</label>
-          <select id="editCategory" required>
-            <option value="Electronics">Electronics</option>
-            <option value="Clothing">Clothing</option>
-            <option value="Accessories">Accessories</option>
-            <option value="Gadgets">Gadgets</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Change Image (Optional)</label>
-          <input type="file" id="editImageFile" accept="image/*">
-        </div>
-        <div class="form-group">
-          <label>Description</label>
-          <textarea id="editDescription" rows="3"></textarea>
-        </div>
-        <button type="submit" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">Update Product 💾</button>
-      </form>
+      <!-- Product Table -->
+      <div class="container">
+        <h2>📋 Existing Products</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Name</th>
+              <th>Price</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="adminProductTable">
+            <!-- Products loaded dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- EDIT MODAL -->
+    <div class="modal" id="editModal">
+      <div class="modal-content">
+        <button class="close-btn" onclick="closeEditModal()">✖</button>
+        <h2>✏️ Edit Product</h2>
+        <form id="editForm">
+          <input type="hidden" id="editId">
+          <div class="form-group">
+            <label>Product Name</label>
+            <input type="text" id="editName" required>
+          </div>
+          <div class="form-group">
+            <label>Price (BDT)</label>
+            <input type="number" id="editPrice" required>
+          </div>
+          <div class="form-group">
+            <label>Category</label>
+            <select id="editCategory" required>
+              <option value="Electronics">Electronics</option>
+              <option value="Clothing">Clothing</option>
+              <option value="Accessories">Accessories</option>
+              <option value="Gadgets">Gadgets</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Change Image (Optional)</label>
+            <input type="file" id="editImageFile" accept="image/*">
+          </div>
+          <div class="form-group">
+            <label>Description</label>
+            <textarea id="editDescription" rows="3"></textarea>
+          </div>
+          <button type="submit" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">Update Product 💾</button>
+        </form>
+      </div>
     </div>
   </div>
 
   <script>
+    // ==========================================
+    // 🔒 PASSWORD PROTECTION LOGIC
+    // ==========================================
+    const SECRET_PASS = "AyshaKhadiza";
+    
+    function checkAuth() {
+      let savedAuth = sessionStorage.getItem("adminAuth");
+      if (savedAuth === "true") {
+        document.getElementById("mainAdminWrapper").style.display = "block";
+        fetchOrders();
+        fetchAdminProducts();
+        return;
+      }
+
+      let userPass = prompt("Enter Admin Password:");
+      if (userPass === SECRET_PASS) {
+        sessionStorage.setItem("adminAuth", "true");
+        document.getElementById("mainAdminWrapper").style.display = "block";
+        fetchOrders();
+        fetchAdminProducts();
+      } else {
+        alert("Wrong Password! Access Denied.");
+        document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:20%;'>Access Denied 🔒</h1>";
+      }
+    }
+
+    // ==========================================
+    // ⚙️ ORIGINAL DASHBOARD LOGIC
+    // ==========================================
     const form = document.getElementById('productForm');
     const msg = document.getElementById('msg');
     let productsList = [];
@@ -476,8 +513,8 @@
       }
     });
 
-    fetchOrders();
-    fetchAdminProducts();
+    // START AUTH CHECK
+    checkAuth();
   </script>
 </body>
 </html>
