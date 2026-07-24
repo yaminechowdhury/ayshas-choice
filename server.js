@@ -91,13 +91,29 @@ app.get('/api/products', async (req, res) => {
   }
 });
 
-app.post('/api/products', upload.single('imageFile'), async (req, res) => {
+// ➕ POST: Upload 1 to 10 Images
+app.post('/api/products', upload.array('imageFiles', 10), async (req, res) => {
   try {
-    if (!req.file) return res.status(400).json({ error: "Image file is required!" });
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ error: "At least 1 image file is required!" });
+    }
+    if (req.files.length > 10) {
+      return res.status(400).json({ error: "Maximum 10 images allowed!" });
+    }
+
     const { name, price, category, description } = req.body;
+    
+    // আপলোড হওয়া সব ছবির লিংক অ্যারে হিসেবে তৈরি
+    const imageUrls = req.files.map(file => `/uploads/${file.filename}`);
+
     const newProduct = new Product({
-      name, price, category: category || 'General', image: `/uploads/${req.file.filename}`, description
+      name, 
+      price, 
+      category: category || 'General', 
+      images: imageUrls, // 'images' অ্যারে হিসেবে সেভ হবে
+      description
     });
+
     const saved = await newProduct.save();
     res.status(201).json({ message: "Product Created Successfully! 🎉", data: saved });
   } catch (error) {
@@ -105,12 +121,20 @@ app.post('/api/products', upload.single('imageFile'), async (req, res) => {
   }
 });
 
-app.put('/api/products/:id', upload.single('imageFile'), async (req, res) => {
+// ✏️ PUT: Update Product (Optionally replace images)
+app.put('/api/products/:id', upload.array('imageFiles', 10), async (req, res) => {
   try {
     const { name, price, category, description } = req.body;
     let updateData = { name, price, category, description };
-    if (req.file) updateData.image = `/uploads/${req.file.filename}`;
-    
+
+    // যদি নতুন ছবি দেওয়া হয়
+    if (req.files && req.files.length > 0) {
+      if (req.files.length > 10) {
+        return res.status(400).json({ error: "Maximum 10 images allowed!" });
+      }
+      updateData.images = req.files.map(file => `/uploads/${file.filename}`);
+    }
+
     const updated = await Product.findByIdAndUpdate(req.params.id, updateData, { new: true });
     res.status(200).json({ message: "Product Updated Successfully! ✏️", data: updated });
   } catch (error) {
